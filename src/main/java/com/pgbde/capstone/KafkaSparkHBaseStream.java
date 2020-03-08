@@ -28,9 +28,7 @@ import java.util.*;
 
 
 /**
- * Calculate the simple moving average closing price of the four TransactionDatas
- * in a 5-minute sliding window for the last 10 minutes
- *
+ *Main program to listen to kafka queue.
  *
  * input parameters : localhost 18.211.252.152:9092 transactions-topic-verified output/card_transactions.csv
  */
@@ -111,6 +109,7 @@ public class KafkaSparkHBaseStream {
 
     /**
      * Method to apply rules on the transaction Data.
+     * Update the status into the transaction data pojo
      * @param transactionData
      * @param disUtil
      */

@@ -23,23 +23,25 @@ public class HBaseUtils {
     private static Table lookupTable =null;
 
     public static void main(String[] args) throws Exception {
+        init();
 //      write to HBase
         addRecord(lookupTable,"659990931314251", MEMBER_DETAILS, "score", "297");
-        addRecord(lookupTable,"659990931314251", CARD_DETAILS, "member_id", "928036864799687");
-        addRecord(lookupTable,"659990931314251", TRANSACTION_DETAILS, "postcode", "48060");
-        addRecord(lookupTable,"659990931314251", TRANSACTION_DETAILS, "transaction_dt", "31-10-2017 23:10:04");
-        addRecord(lookupTable,"659990931314251", TRANSACTION_DETAILS, "ucl", "1.3567");
+//        addRecord(lookupTable,"659990931314251", CARD_DETAILS, "member_id", "928036864799687");
+//        addRecord(lookupTable,"659990931314251", TRANSACTION_DETAILS, "postcode", "48060");
+//        addRecord(lookupTable,"659990931314251", TRANSACTION_DETAILS, "transaction_dt", "31-10-2017 23:10:04");
+//        addRecord(lookupTable,"659990931314251", TRANSACTION_DETAILS, "ucl", "1.3567");
 
 //      read from HBase
         LookupData data = getRecord( "659990931314251");
         System.out.println(data.toString());
+        close();
 
     }
 
     private static void init(){
 
         Configuration conf = HBaseConfiguration.create();
-        conf.addResource(new Path("file:///Users/dks0410482/Downloads/hbase-1.6.0/conf/hbase-site.xml"));
+        conf.addResource(new Path("file:///~/Downloads/hbase-1.6.0/conf/hbase-site.xml"));
 
         try {
             connection = ConnectionFactory.createConnection(conf);
