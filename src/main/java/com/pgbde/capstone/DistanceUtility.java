@@ -1,66 +1,48 @@
 package com.pgbde.capstone;
 
+import com.pgbde.capstone.bean.ZipCodeData;
+
 import java.io.*;
 import java.util.HashMap;
 
-/**
- * Utility class that reads file zipCodePosId.csv and using same if two zip
- * codes are provided, it returns distances.
- *
- */
-
-class ZipCodeData implements Serializable {
-	double lat;
-	double lon;
-	String city;
-	String state_name;
-	String postId;
-
-	public ZipCodeData(double lat, double lon, String city, String state_name, String postId) {
-		this.lat = lat;
-		this.lon = lon;
-		this.city = city;
-		this.state_name = state_name;
-		this.postId = postId;
-	}
-}
-
 class DistanceUtility implements Serializable {
 
-	HashMap<String, ZipCodeData> zipCodesMap = new HashMap<String, ZipCodeData>();
+	static HashMap<String, ZipCodeData> zipCodesMap = new HashMap<String, ZipCodeData>();
 
 
-	public static DistanceUtility getInstance(){
-		final DistanceUtility distanceUtility = new DistanceUtility();
-		return distanceUtility;
-	}
 	/**
 	 * Initialize zip codes using given file
-	 * @throws IOException 
-	 * @throws NumberFormatException 
+	 * @throws IOException
+	 * @throws NumberFormatException
 	 */
-	private DistanceUtility()  {
+	public DistanceUtility(String input)  {
 
 		try {
-			File file = new File(this.getClass().getResource("/zipCodePosId.csv").getFile());
-			BufferedReader br = new BufferedReader(new FileReader(file));
-			String line = null;
+			if(zipCodesMap.size() ==0) {
 
-			while ((line = br.readLine()) != null) {
-				String str[] = line.split(",");
+				System.out.println(input);
+				File file = new File(input);
 
-				String zipCode = str[0];
+				BufferedReader br = new BufferedReader(new FileReader(file));
+				String line = null;
 
-				double lat = Double.parseDouble(str[1]);
-				double lon = Double.parseDouble(str[2]);
-				;
-				String city = str[3];
-				String state_name = str[4];
-				String postId = str[5];
+				while ((line = br.readLine()) != null) {
+					String str[] = line.split(",");
 
-				ZipCodeData zipCodeData = new ZipCodeData(lat, lon, city, state_name, postId);
+					String zipCode = str[0];
 
-				zipCodesMap.put(zipCode, zipCodeData);
+					double lat = Double.parseDouble(str[1]);
+					double lon = Double.parseDouble(str[2]);
+					;
+					String city = str[3];
+					String state_name = str[4];
+					String postId = str[5];
+
+					ZipCodeData zipCodeData = new ZipCodeData(lat, lon, city, state_name, postId);
+
+					zipCodesMap.put(zipCode, zipCodeData);
+
+				}
 			}
 		}catch (Exception e){
 			System.err.println("Failed to load ZipCodePosId.csv");
@@ -102,7 +84,7 @@ class DistanceUtility implements Serializable {
 	}
 
 	public static void main(String[] args) {
-		DistanceUtility utility =  DistanceUtility.getInstance();
+		DistanceUtility utility =  new DistanceUtility("/Users/dks0410482/Desktop/workspace/Capstone/fraud-analysis/input/zipCodePosId.csv");
 		System.out.println(utility.getDistanceViaZipCode("10503","10504"));
 	}
 }

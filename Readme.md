@@ -17,17 +17,18 @@ Main class KafkaSparkHBaseStream accepts following mandatory parameters in argum
  
 kafkahost with port : 18.211.252.152:9092 
 topic-name : transactions-topic-verified
+input zipcode.csv path : /home/ec2-user/
 output folder to keep the card transactions :  -output/
 iteration number : to generate the groupId for kakfa consumer
 
 
 mvn clean package 
 
-java -cp target/FraudAnalysis-jar-with-dependencies.jar com.pgbde.capstone.KafkaSparkHBaseStream 18.211.252.152:9092 transactions-topic-verified output/ 7
+java -cp target/FraudAnalysis-jar-with-dependencies.jar com.pgbde.capstone.KafkaSparkHBaseStream 18.211.252.152:9092 transactions-topic-verified "/Users/dks0410482/Desktop/workspace/Capstone/fraud-analysis/input/zipCodePosId.csv" output/ 7
 
 
 To run the same in AWS
-nohup spark2-submit --class com.pgbde.capstone.KafkaSparkHBaseStream --master yarn --deploy-mode client --executor-memory 4G FraudAnalysis-jar-with-dependencies.jar 18.211.252.152:9092 transactions-topic-verified output/ 7 >> output.txt &
+nohup spark2-submit --class com.pgbde.capstone.KafkaSparkHBaseStream --master yarn --deploy-mode client --executor-memory 4G FraudAnalysis-jar-with-dependencies.jar 18.211.252.152:9092 transactions-topic-verified /home/ec2-user/capstone/data/xipCodePosId.csv output/ 11 >> output.txt &
 
 
 

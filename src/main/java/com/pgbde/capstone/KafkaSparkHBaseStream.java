@@ -9,14 +9,12 @@ import org.apache.kafka.connect.json.JsonDeserializer;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
 import org.apache.spark.SparkConf;
-import org.apache.spark.api.java.JavaPairRDD;
 import org.apache.spark.api.java.JavaRDD;
 import org.apache.spark.api.java.function.*;
 import org.apache.spark.streaming.Duration;
 import org.apache.spark.streaming.Durations;
 import org.apache.spark.streaming.api.java.JavaDStream;
 import org.apache.spark.streaming.api.java.JavaInputDStream;
-import org.apache.spark.streaming.api.java.JavaPairDStream;
 import org.apache.spark.streaming.api.java.JavaStreamingContext;
 import org.apache.spark.streaming.kafka010.ConsumerStrategies;
 import org.apache.spark.streaming.kafka010.KafkaUtils;
@@ -41,14 +39,15 @@ public class KafkaSparkHBaseStream {
     public static String GENUINE_STATUS = "Genuine";
     public static double THRESHOLD_KM_PER_SEC =0.25 ;
     static SimpleDateFormat transactionDateFormat =new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");//31-10-2017 23:10:04
+    public static final String ZIPCODE_CSV = "";
 
     public static void main(String[] args) throws InterruptedException {
         Logger.getLogger("org").setLevel(Level.OFF);
         Logger.getLogger("akka").setLevel(Level.OFF);
 
-        if (args.length < 4 ) {
+        if (args.length < 5 ) {
 
-            System.out.println(" Program Input missing:   kafka hostname:port , topic name , output path, iteration" +
+            System.out.println(" Program Input missing:   kafka hostname:port , topic name , input zipcode csv, output path, iteration" +
                     "eg:  localhost:9092 TransactionDataData input/ output/ 7");
             System.exit(0);
         }
@@ -57,8 +56,9 @@ public class KafkaSparkHBaseStream {
         String topic = args[1];//"TransactionDataData";// "TransactionDatastream";
 
         Duration batDuration = Durations.seconds(1);
-        String outputPath = args[2];
-        String groupId = GROUP_ID + args[3];
+        String inputPath = args[2];
+        String outputPath = args[3];
+        String groupId = GROUP_ID + args[4];
 
         System.out.println("Executing KafkaMVAStream ");
         SparkConf sparkConf = new SparkConf().setAppName("KafkaSparkStreaming").setMaster("local[*]");
@@ -75,7 +75,7 @@ public class KafkaSparkHBaseStream {
 
         Set<String> topicSet = new HashSet<String>(Arrays.asList(topic.split(",")));
 
-            DistanceUtility disUtil= DistanceUtility.getInstance();
+        DistanceUtility disUtil= new DistanceUtility(inputPath);
 
 
         JavaInputDStream<ConsumerRecord<String, String>> messages = KafkaUtils.createDirectStream(streamingContext,
@@ -125,6 +125,7 @@ public class KafkaSparkHBaseStream {
      */
     private static void applyRules(TransactionData transactionData, DistanceUtility disUtil) throws ParseException {
 
+        System.out.println("Processing : "+transactionData.toString());
         //Credit score of each member: Get the credit scode from HBase "transaction_lookup_table" table
         //MemberDetails.score
         //Last used Pincode from HBase "transaction_lookup_table" table.
@@ -137,7 +138,7 @@ public class KafkaSparkHBaseStream {
 
             String lastPincode = data.getPostCode();
             Integer memberscore = data.getScore();
-            
+
             if (memberscore < 200){
                 transactionStatus = FRAUD_STATUS;
             }else {
