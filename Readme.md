@@ -8,9 +8,25 @@ Run the following command in different windows bin/zookeeper-server-start.sh con
 
 bin/kafka-server-start.sh config/server.properties
 
-bin/kafka-console-producer.sh --broker-list localhost:9092 --topic stockstream
+bin/kafka-console-producer.sh --broker-list localhost:9092 --topic transactions-topic-verified
 
-Paste the following json string as input to the stream in the producer window. (BTC,{"symbol":"BTC","count":1,"timestamp":"2019-11-10 01:34:00","priceData":{"total":0.0,"close":8783.09,"high":8787.21,"low":8783.09,"open":8786.94,"volume":16169.987}})
+Paste the following json string as input to the stream in the producer window.
+{
+                                                                              
+“card_id”:348702330256514,
+
+“member_id”: 000037495066290,
+
+“amount”: 9084849,
+
+“pos_id”: 614677375609919,
+
+“postcode”: 33946,
+
+“transaction_dt”: “11-02-2018 00:00:00”
+
+}
+
 
 Spark program with kafka stream
 Main class KafkaSparkHBaseStream accepts following mandatory parameters in arguments
@@ -28,7 +44,7 @@ java -cp target/FraudAnalysis-jar-with-dependencies.jar com.pgbde.capstone.Kafka
 
 
 To run the same in AWS
-nohup spark2-submit --class com.pgbde.capstone.KafkaSparkHBaseStream --master yarn --deploy-mode client --executor-memory 4G FraudAnalysis-jar-with-dependencies.jar 18.211.252.152:9092 transactions-topic-verified /home/ec2-user/capstone/data/xipCodePosId.csv output/ 11 >> output.txt &
+nohup spark2-submit --class com.pgbde.capstone.KafkaSparkHBaseStream --master yarn --deploy-mode client --executor-memory 4G FraudAnalysis-jar-with-dependencies.jar 18.211.252.152:9092 transactions-topic-verified /home/ec2-user/capstone/data/zipCodePosId.csv output/ 11 >> output.txt &
 
 
 

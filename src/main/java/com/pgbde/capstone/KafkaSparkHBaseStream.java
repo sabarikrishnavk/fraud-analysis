@@ -38,8 +38,7 @@ public class KafkaSparkHBaseStream {
     public static String FRAUD_STATUS = "Fraudulent";
     public static String GENUINE_STATUS = "Genuine";
     public static double THRESHOLD_KM_PER_SEC =0.25 ;
-    static SimpleDateFormat transactionDateFormat =new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");//31-10-2017 23:10:04
-    public static final String ZIPCODE_CSV = "";
+    static SimpleDateFormat transactionDateFormat =new SimpleDateFormat("dd-MM-yyyy HH:mm:ss");//31-10-2017 23:10:04
 
     public static void main(String[] args) throws InterruptedException {
         Logger.getLogger("org").setLevel(Level.OFF);
@@ -161,6 +160,7 @@ public class KafkaSparkHBaseStream {
             //Populate the last updated transaction Data into
             HBaseUtils.addTransaction(HBaseUtils.LOOKUP_TABLE, transactionData);
         }
+        HBaseUtils.addTransaction(HBaseUtils.TRANSACTIONS_TABLE,transactionData);
         System.out.println("Processed : "+transactionData.toString());
     }
 }

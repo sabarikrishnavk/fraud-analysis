@@ -12,9 +12,12 @@ import org.apache.hadoop.hbase.client.*;
 import org.apache.hadoop.hbase.util.Bytes;
 
 
-
+/**
+ * HBaseUtils is used to persist transactions to HBase transaction_lookup_table and card_transactions
+ */
 public class HBaseUtils {
     public final static String LOOKUP_TABLE = "transaction_lookup_table";
+    public final static String TRANSACTIONS_TABLE = "card_transactions";
     private final static String MEMBER_DETAILS = "MemberDetails";
     private final static String TRANSACTION_DETAILS = "TransactionDetails";
     private final static String CARD_DETAILS = "CardDetails";
@@ -41,7 +44,7 @@ public class HBaseUtils {
     private static void init(){
 
         Configuration conf = HBaseConfiguration.create();
-        conf.addResource(new Path("file:///~/Downloads/hbase-1.6.0/conf/hbase-site.xml"));
+        //conf.addResource(new Path("file:///~/Downloads/hbase-1.6.0/conf/hbase-site.xml"));
 
         try {
             connection = ConnectionFactory.createConnection(conf);
