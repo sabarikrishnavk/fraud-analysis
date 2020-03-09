@@ -54,70 +54,15 @@
             <artifactId>hbase-spark</artifactId>
             <version>1.0.0</version>
         </dependency>
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hbase</groupId>-->
-<!--            <artifactId>hbase-client</artifactId>-->
-<!--            <version>2.1.0</version>-->
-<!--        </dependency>-->
-
-
-        <!-- https://mvnrepository.com/artifact/org.apache.hbase/hbase -->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hbase</groupId>-->
-<!--            <artifactId>hbase-common</artifactId>-->
-<!--            <version>1.2.0-cdh5.15.1</version>-->
-<!--            <type>pom</type>-->
-<!--        </dependency>-->
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.hbase/hbase &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hbase</groupId>-->
-<!--            <artifactId>hbase-server</artifactId>-->
-<!--            <version>1.2.0-cdh5.15.1</version>-->
-<!--            <type>pom</type>-->
-<!--        </dependency>-->
-
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/com.ngdata/hbase-indexer-mr &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>com.ngdata</groupId>-->
-<!--            <artifactId>hbase-indexer-mr</artifactId>-->
-<!--            <version>1.5-cdh5.15.1</version>-->
-<!--        </dependency>-->
-
-
-<!--        &lt;!&ndash; https://mvnrepository.com/artifact/org.apache.hbase/hbase &ndash;&gt;-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hadoop</groupId>-->
-<!--            <artifactId>hadoop-common</artifactId>-->
-<!--            <version>2.6.0-cdh5.15.1</version>-->
-<!--            <type>pom</type>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hadoop</groupId>-->
-<!--            <artifactId>hadoop-core</artifactId>-->
-<!--            <version>2.6.0-mr1-cdh5.15.1</version>-->
-<!--            <type>pom</type>-->
-<!--        </dependency>-->
-
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hadoop</groupId>-->
-<!--            <artifactId>hadoop-mapreduce-client-jobclient</artifactId>-->
-<!--            <version>2.6.0-cdh5.15.1</version>-->
-<!--            <type>pom</type>-->
-<!--        </dependency>-->
-<!--        <dependency>-->
-<!--            <groupId>org.apache.hbase</groupId>-->
-<!--            <artifactId>hbase-common</artifactId>-->
-<!--            <version>1.2.0-cdh5.15.1</version>-->
-<!--            <scope>compile</scope>-->
-<!--        </dependency>-->
-
 
     </dependencies>
     <build>
         <finalName>FraudAnalysis</finalName>
+        <resources>
+            <resource>
+                <directory>src/resources</directory>
+            </resource>
+        </resources>
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -126,7 +71,7 @@
                 <configuration>
                     <archive>
                         <manifest>
-                            <mainClass>com.pgbde.realtime.SparkStreamApplication</mainClass>
+                            <mainClass>com.pgbde.capstone.KafkaSparkHBaseStream</mainClass>
                         </manifest>
                     </archive>
                     <descriptorRefs>

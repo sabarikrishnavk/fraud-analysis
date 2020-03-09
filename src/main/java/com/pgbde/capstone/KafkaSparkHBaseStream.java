@@ -24,20 +24,23 @@ import org.apache.spark.streaming.kafka010.LocationStrategies;
 import scala.Tuple2;
 
 import java.io.IOException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
 /**
  *Main program to listen to kafka queue.
  *
- * input parameters : localhost 18.211.252.152:9092 transactions-topic-verified output/card_transactions.csv
+ * input parameters :  18.211.252.152:9092 transactions-topic-verified output/
  */
 public class KafkaSparkHBaseStream {
 
-    public static String GROUP_ID ="kafkaspark-sabarivk-7";// "TransactionDatagroup";
+    public static String GROUP_ID ="kafkaspark-sabarivk-";// "TransactionDatagroup";
     public static String FRAUD_STATUS = "Fraudulent";
     public static String GENUINE_STATUS = "Genuine";
-    public static double THRESHOLD_DISTANCE = 10000.0;
+    public static double THRESHOLD_KM_PER_SEC =0.25 ;
+    static SimpleDateFormat transactionDateFormat =new SimpleDateFormat("dd/MM/yyyy HH:mm:ss");//31-10-2017 23:10:04
 
     public static void main(String[] args) throws InterruptedException {
         Logger.getLogger("org").setLevel(Level.OFF);
@@ -45,17 +48,17 @@ public class KafkaSparkHBaseStream {
 
         if (args.length < 4 ) {
 
-            System.out.println(" Program Input missing:  hostname, kafka hostname:port , topic name , batch interval, window interval , sliding interval (in minutes) ," +
-                    "eg: localhost localhost:9092 TransactionDataData output/sma");
+            System.out.println(" Program Input missing:   kafka hostname:port , topic name , output path, iteration" +
+                    "eg:  localhost:9092 TransactionDataData input/ output/ 7");
             System.exit(0);
         }
 
-        String hostname = args[0];
-        String broker = args[1];//"localhost:9092";
-        String topic = args[2];//"TransactionDataData";// "TransactionDatastream";
+        String broker = args[0];//"localhost:9092";
+        String topic = args[1];//"TransactionDataData";// "TransactionDatastream";
 
         Duration batDuration = Durations.seconds(1);
-        String outputPath = args[3];
+        String outputPath = args[2];
+        String groupId = GROUP_ID + args[3];
 
         System.out.println("Executing KafkaMVAStream ");
         SparkConf sparkConf = new SparkConf().setAppName("KafkaSparkStreaming").setMaster("local[*]");
@@ -66,7 +69,7 @@ public class KafkaSparkHBaseStream {
         kafkaParams.put("bootstrap.servers", broker);
         kafkaParams.put("key.deserializer", StringDeserializer.class);
         kafkaParams.put("value.deserializer", JsonDeserializer.class);
-        kafkaParams.put("group.id", GROUP_ID);
+        kafkaParams.put("group.id", groupId);
         kafkaParams.put("auto.offset.reset", "earliest");
         kafkaParams.put("enable.auto.commit", false);
 
@@ -78,7 +81,8 @@ public class KafkaSparkHBaseStream {
         JavaInputDStream<ConsumerRecord<String, String>> messages = KafkaUtils.createDirectStream(streamingContext,
             LocationStrategies.PreferConsistent(), ConsumerStrategies.<String, String> Subscribe(topicSet, kafkaParams));
  
-        //Create a D stream with TransactionData data.
+        //Create a D stream with TransactionData data and update the transaction status based on the rules.
+        //Update the same object.
         JavaDStream<TransactionData> keyMap = messages.map(new Function<ConsumerRecord<String, String>, TransactionData>() {
                @Override
                public TransactionData call(ConsumerRecord<String, String> record) throws Exception {
@@ -90,7 +94,7 @@ public class KafkaSparkHBaseStream {
            }
         );
 
-
+// Sample output print
         keyMap.foreachRDD(new VoidFunction<JavaRDD<TransactionData>>() {
             @Override
             public void call(JavaRDD<TransactionData> transactionDataJavaRDD) throws Exception {
@@ -100,8 +104,14 @@ public class KafkaSparkHBaseStream {
                 } );
             }
         });
-        keyMap.print();
-
+        //Print the output into the file
+        keyMap.foreachRDD(new VoidFunction<JavaRDD<TransactionData>>() {
+            private static final long serialVersionUID = 6767679;
+            public void call(JavaRDD<TransactionData> t)
+                    throws Exception {
+                t.coalesce(1).saveAsTextFile(outputPath+java.io.File.separator + System.currentTimeMillis());
+            }
+        });
         streamingContext.start();
         streamingContext.awaitTermination();
 
@@ -113,7 +123,7 @@ public class KafkaSparkHBaseStream {
      * @param transactionData
      * @param disUtil
      */
-    private static void applyRules(TransactionData transactionData, DistanceUtility disUtil) {
+    private static void applyRules(TransactionData transactionData, DistanceUtility disUtil) throws ParseException {
 
         //Credit score of each member: Get the credit scode from HBase "transaction_lookup_table" table
         //MemberDetails.score
@@ -127,12 +137,20 @@ public class KafkaSparkHBaseStream {
 
             String lastPincode = data.getPostCode();
             Integer memberscore = data.getScore();
+            
             if (memberscore < 200){
                 transactionStatus = FRAUD_STATUS;
             }else {
+
                 double distance = disUtil.getDistanceViaZipCode(lastPincode, transactionData.getPostcode());
 
-                if (distance > THRESHOLD_DISTANCE) {
+                Date transactionDate =  transactionDateFormat.parse(transactionData.getTransaction_dt());
+                Date lastTransactionDate =  transactionDateFormat.parse(data.getTransactionDate());
+
+                long diff = transactionDate.getTime() - lastTransactionDate.getTime();
+                long diffSeconds = diff / 1000 % 60;
+
+                if (diffSeconds > 0 && (distance/diffSeconds) > THRESHOLD_KM_PER_SEC) {
                     transactionStatus = FRAUD_STATUS;
                 }
             }

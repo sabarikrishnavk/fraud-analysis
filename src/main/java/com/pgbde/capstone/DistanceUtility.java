@@ -44,7 +44,6 @@ class DistanceUtility implements Serializable {
 		try {
 			File file = new File(this.getClass().getResource("/zipCodePosId.csv").getFile());
 			BufferedReader br = new BufferedReader(new FileReader(file));
-
 			String line = null;
 
 			while ((line = br.readLine()) != null) {
@@ -104,18 +103,6 @@ class DistanceUtility implements Serializable {
 
 	public static void main(String[] args) {
 		DistanceUtility utility =  DistanceUtility.getInstance();
-		System.out.println(utility.getDistanceViaZipCode("75848","75101"));
+		System.out.println(utility.getDistanceViaZipCode("10503","10504"));
 	}
 }
-
-/*//To get the distance between two zipcodes from the main class  
-public class PostcodeCalculator
-{
-	public static void main(String args[]) throws NumberFormatException, IOException
-	{
-		DistanceUtility disUtil=new DistanceUtility();
-		
-		System.out.println(disUtil.getDistanceViaZipCode("10001", "10524"));
-	}
-}
-*/

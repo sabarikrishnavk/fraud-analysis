@@ -14,17 +14,21 @@ Paste the following json string as input to the stream in the producer window. (
 
 Spark program with kafka stream
 Main class KafkaSparkHBaseStream accepts following mandatory parameters in arguments
-
-hostname - localhost 
-kafkahost :port -18.211.252.152:9092 
-topic-name - transactions-topic-verified 
-ouput folder -output/card_transactions.csv
+ 
+kafkahost with port : 18.211.252.152:9092 
+topic-name : transactions-topic-verified
+output folder to keep the card transactions :  -output/
+iteration number : to generate the groupId for kakfa consumer
 
 
 mvn clean package 
 
-java -cp target/FraudAnalysis-jar-with-dependencies.jar 
+java -cp target/FraudAnalysis-jar-with-dependencies.jar com.pgbde.capstone.KafkaSparkHBaseStream 18.211.252.152:9092 transactions-topic-verified output/ 7
 
-com.pgbde.capstone.KafkaSparkHBaseStream localhost 18.211.252.152:9092 transactions-topic-verified output/card_transactions.csv
 
-java -cp target/FraudAnalysis-jar-with-dependencies.jar com.pgbde.capstone.KafkaSparkHBaseStream localhost 18.211.252.152:9092 transactions-topic-verified output/card_transactions.csv
+To run the same in AWS
+nohup spark2-submit --class com.pgbde.capstone.KafkaSparkHBaseStream --master yarn --deploy-mode client --executor-memory 4G FraudAnalysis-jar-with-dependencies.jar 18.211.252.152:9092 transactions-topic-verified output/ 7 >> output.txt &
+
+
+
+
