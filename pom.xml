@@ -19,7 +19,7 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <spark.verion>2.3.2</spark.verion>
-        <kafka.client.verion>2.0.0</kafka.client.verion>
+        <kafka.client.verion>2.8.1.7.2.14.0-149</kafka.client.verion>
     </properties>
     <dependencies>
 
